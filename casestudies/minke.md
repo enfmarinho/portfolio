@@ -87,7 +87,8 @@ graph LR
     class Position_Module,F,B,MG pos
     class Search_Module,N,MP,TT search
     class Eval_Module,NNUE,SIMD,Quant eval
-\```
+```
+
 ### 2.2 Data Transformation Flow
 The engine processes data through several distinct stages, moving from high-level abstractions to hardware-level optimizations:
 
