@@ -63,11 +63,35 @@
 ---
 
 ## 🧰 Technical Toolbox
-* **Languages:** C/C++, Rust, Java, TypeScript, Python, Go, SQL.
-* **Libraries & Frameworks:** PyTorch, TorchVision, scikit-learn, Spring Boot, Bullet ML, GoogleTest.
-* **Developer Tools:** Git, GitHub, CI/CD, Docker, CMake, Make, GDB/LLDB, Valgrind, Google Cloud Platform.
-* **Relevant Coursework:** Operating Systems, Software Engineering, Software Architecture, Computer Architecture, Databases, Concurrent Programming, Deep Learning.
 
+### Systems & Core Languages
+* C/C++: low-level systems programming, memory layout, performance-critical paths
+* Rust: memory-safe concurrent systems, tooling, and automation pipelines
+* Go: backend services, data processing, internal tools, concurrency
+* Python: scientific computing, ML pipelines, data analysis
+* SQL: structured data modeling and querying
+> Philosophy: Prioritizing memory efficiency, performance-critical paths, and deterministic execution.
+
+### Backend, Tooling & Data Pipelines
+
+* Backend Frameworks: Spring Boot (service orchestration), custom Rust CLIs
+* Data & ML: PyTorch, TorchVision, scikit-learn, Bullet ML
+* Data Pipelines: dataset preprocessing, validation, experiment orchestration
+* Serialization & Interfaces: structured data schemas, versioned model artifacts
+    
+### Developer & Systems Tooling
+
+* Build & Debug: CMake, Make, GDB/LLDB, Valgrind
+* Automation & CI: Git, GitHub Actions, CI/CD pipelines, regression testing, distributed validation
+* Infrastructure: Docker, Linux/Unix, Git, Google Cloud Platform
+
+### Systems & Software Foundations
+
+* Operating Systems: processes, memory management, scheduling
+* Computer Architecture: caches, SIMD, instruction-level performance
+* Concurrent Programming: multi-threading, synchronization, determinism, non blocking I/O
+* Databases: schema design, persistence, query performance
+* Software Architecture: modular systems, trade-offs, maintainability
 ---
 
 ### 📖 Technical Philosophy
