@@ -127,6 +127,7 @@ This allows the CPU to pack multiple weights and activations into a single regis
 
 View SIMD Implementation Detail (AVX2 Horizontal Reduction)
 ```C++
+using vepi32 = __m256i;
 inline int32_t vepi32_reduce_add(const vepi32 vec) {
     // Split 256-bit register into two 128-bit halves and add them
     __m128i low = _mm256_castsi256_si128(vec);
@@ -147,7 +148,7 @@ inline int32_t vepi32_reduce_add(const vepi32 vec) {
 * ~105% increase in Nodes Per Second (NPS) compared to the baseline evaluation. 
 * High accuracy evaluation without hurtfully sacrificing search throughput.
 
-#### Search Throughput vs SIMD Instruction Set (x86-64)
+#### Search Throughput vs Instruction Set (x86-64)
 | SIMD             | Nodes/sec   | Speedup      | 
 |:----------------:|:-----------:|:------------:|
 | None             | 1502485     | -            | 
