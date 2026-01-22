@@ -188,7 +188,7 @@ inline int32_t vepi32_reduce_add(const vepi32 vec) {
 * **Bitboard Representation**: Uses 64-bit integers (uint64_t) to represent piece placements. This allows board-wide calculations (like finding all possible pawn pushes) to execute in single-digit CPU instructions via bitwise parallelism.
 
 <div align="center">
-  <img src="../assets/bitboard_visualization.png" alt="bitboard visualization" width="400"/>
+  <img src="../assets/bitboard_visualization.png" alt="bitboard visualization" width="600"/>
 </div>
 
 > Visualizing the State: By treating a uint64_t as an 8×8 grid, we perform symmetric multiprocessing on a single register. For example, a single bitwise AND between a sliding piece bitboard and an occupancy bitboard calculates all possible blockages simultaneously, eliminating the need for expensive loops or nested arrays.
