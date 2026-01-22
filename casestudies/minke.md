@@ -6,22 +6,13 @@
 
 ## 1. Challenge & Core Impact
 
-**Goal:** Build a competitive chess engine capable of evaluating millions of positions per second with high evaluation accuracy.  
+Minke was built as a systems-focused chess engine under strict real-time and memory constraints, where evaluation latency, cache behavior, and search efficiency directly determine playing strength. The primary goal was to maximize effective search depth without sacrificing evaluation accuracy, using empirical validation rather than intuition to guide optimization decisions.
 
-**Result:** Achieved 2nd place among Brazilian engines on CCRL.
-
-
-### 1.1 **Measurable Outcomes:**
-
-- **Performance:** ~105% increase in Nodes Per Second (NPS) through SIMD-accelerated NNUE evaluation compared to baseline  
-- **Memory Optimization:** ~27% speedup in negamax search via **bitboards** and **cache-friendly layouts**  
-- **Validation:** Orchestrated distributed testing framework and CI/CD workflows for continuous validation through regression tests
-- **Automation:** Developed custom Rust tools to automate neural network training with the Bullet framework, improving training efficiency and enabling faster validation cycles.
+High-level outcomes (ranking, throughput gains) are documented in the project README and portfolio overview; this case study focuses exclusively on the architectural and performance engineering decisions that led to those results.
 
 ---
 
-## 2. Architecture: The Decision-Making Pipeline
-### 2.1 System Overview & Data Flow
+## 2 Core Architectural Overview
 ```mermaid
 graph LR
     %%{init: {'theme': 'neutral', 'flowchart': {'curve': 'basis'}}}%%
@@ -89,42 +80,15 @@ graph LR
     class Eval_Module,NNUE,SIMD,Quant eval
 ```
 
-### 2.2 Data Transformation Flow
-The engine processes data through several distinct stages, moving from high-level abstractions to hardware-level optimizations:
+The engine follows a tightly coupled search–evaluation loop, illustrated in the architecture diagram above.
 
-1. **Ingestion (FEN to Bitboards):** Convert the FEN (Forsyth-Edwards Notation) string into 64-bit integers (bitboards). Bitwise operations allow board-wide calculations, like move generation and make/unmake moves to update the board state, to execute in a few CPU instructions.
+* **State Representation**: Game state is represented using bitboards, enabling cache-friendly move generation and constant-time make/unmake operations with minimal per-node overhead.
 
-2. **Move Generation & Search Tree:** Build a Negamax search tree with alpha-beta pruning and optimized heuristics. Millions of potential positions are explored recursively to select the move with the highest expected score.
+* **Search Loop**: performs a Negamax search with alpha-beta pruning. Under realistic branching factors, evaluation is invoked millions of times, making evaluation latency the dominant contributor to overall throughput.
 
-3. **The Evaluation, Easily Updated Neural Network (NNUE):** At the leaves of the search tree, the engine scores the position so the search can choose the best path in the tree. Instead of recomputing the entire network from scratch for every move, only the neurons affected by the move are updated, thus performing only incremental changes in the network, saving computational power 
+* **Evaluation Model**: Position evaluation uses an Efficiently Updatable Neural Network (NNUE), where only neurons affected by a move are incrementally updated. Despite this optimization, NNUE inference remains the primary per-node cost.
 
-4. **Hardware Acceleration (SIMD):** NNUE inference runs on **SIMD-accelerated kernels**. The network is **quantized to 16-bit integers**, allowing to load multiple weights and activations per CPU register, enabling several operations simultaneously. This parallelism significantly reduces evaluation time, increasing engine speed.
-
-### 2.3 Core Engine Components
-
-**I. Core Engine State & Logic**
-
-* **Position & MoveGen:** Manages board representation via bitboards and implements the rules of chess. This layer is optimized for bitwise parallelism and branch minimization, maximizing move generation throughput.
-
-* **Transposition Table (TT):** A large hash table used for memoization, storing previously searched positions to avoid redundant computation. Entries are cache-aligned to reduce memory latency and improve probe performance under heavy search workloads.
-
-* **Evaluation:** The position scoring module. Integrates NNUE evaluation with SIMD-accelerated kernels, providing high-fidelity evaluations while maintaining search throughput
-
-**II. Search & Heuristics**
-
-* **Search Engine:** The central coordinator implementing the Negamax algorithm with Alpha-Beta pruning, augmented by multiple pruning, reduction, and ordering heuristics to maximize effective search depth and increase playing strength.
-
-* **MovePicker (Iterator Pattern):** An optimized, lazy iterator that generates and scores moves in stages (e.g., captures, killers, quiet moves). Effective move ordering is critical, as it allows Alpha-Beta pruning to approach its best-case complexity of O(b^(d/2)), while avoiding unnecessary move generation in pruned branches.
-
-* **History Tables (Heuristic Learning):** A statistical heuristic that tracks move effectiveness across the search tree, enabling dynamic improvement of move ordering. Moves that historically cause cutoffs are prioritized under the assumption that strong moves tend to generalize across similar positions.
-
-**III. Infrastructure & Orchestration**
-
-* **UCI (Universal Chess Interface):** The communication layer that handles the standard protocol for interacting with GUIs and testing frameworks.
-
-* **Time Manager (Resource Allocation):** A control module that dynamically allocates time usage based on remaining clock, move overhead, game complexity, and score stability.
-
-* **Tune:** tuning pipeline for hyper-parameter optimization, used to identify ELO-positive values for search heuristics through large-scale automated testing
+* **Hardware-Level Optimization**: To mitigate this bottleneck, NNUE inference is implemented using SIMD, 16-bit quantized kernels, maximizing instruction-level parallelism and cache efficiency.
 
 ---
 
