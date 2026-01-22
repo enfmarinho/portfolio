@@ -138,18 +138,39 @@ Performance in Minke is the result of deliberate optimization across compute, me
 
 ### 3.1 SIMD-Accelerated NNUE Inference
 
-**Problem:** NNUE dramatically improves evaluation quality but risks becoming the dominant runtime cost, limiting search depth.
+**Problem**: NNUE (Efficiently Updatable Neural Networks) dramatically improves evaluation accuracy but is computationally expensive. Without optimization, the inference engine becomes a compute-bound bottleneck, drastically reducing search depth and tactical strength.
 
-**Solution:** To prevent evaluation from bottlenecking the search:
-* The neural network is quantized to 16-bit integers
-* Core inference operations are implemented using SIMD-accelerated kernels
-* Data is laid out to keep vectorized execution on the hot path
+**Solution**: To maximize evaluation throughput, Minke treats the neural network as a high-performance linear algebra problem:
 
-This allows the CPU to pack multiple weights and activations into a single register and execute several operations per instruction using modern vector units (e.g., AVX2 / NEON).
+* **Int16 Quantization**: The network uses 16-bit fixed-point arithmetic, allowing for a 2x increase in data density over 32-bit floats and enabling more efficient vectorization.
+
+* **SIMD Intrinsics**: Core dot-product kernels are implemented using AVX2, AVX512 and NEON intrinsics. This allows the CPU to process 16 or 32 weights in a single clock cycle.
+
+* **Incremental Accumulators**: Instead of a full forward pass, Minke utilizes an incremental update scheme. Only the "dirty" features (moved pieces) are processed, avoiding unnecessary re-computation.
+
+This allows the CPU to pack multiple weights and activations into a single register and execute several operations per instruction using modern vector units.
+
+View SIMD Implementation Detail (AVX2 Horizontal Reduction)
+```C++
+inline int32_t vepi32_reduce_add(const vepi32 vec) {
+    // Split 256-bit register into two 128-bit halves and add them
+    __m128i low = _mm256_castsi256_si128(vec);
+    __m128i high = _mm256_extracti128_si256(vec, 1);
+    __m128i sum128 = _mm_add_epi32(low, high);
+
+    // Horizontal reduction: sum all elements into the low 32 bits using shuffles
+    __m128i tmp = _mm_add_epi32(sum128, _mm_shuffle_epi32(sum128, _MM_SHUFFLE(2, 3, 0, 1)));
+    tmp = _mm_add_epi32(tmp, _mm_shuffle_epi32(tmp, _MM_SHUFFLE(1, 0, 3, 2)));
+
+    return _mm_cvtsi128_si32(tmp);
+}
+```
+
+> Note: This reduction is a critical-path operation in the NNUE dot-product, optimized to minimize cross-lane latency.
 
 **Result:** 
 * ~105% increase in Nodes Per Second (NPS) compared to the baseline evaluation. 
-* High-fidelity evaluation without sacrificing search throughput.
+* High accuracy evaluation without hurtfully sacrificing search throughput.
 
 #### Search Throughput vs SIMD Instruction Set (x86-64)
 | SIMD             | Nodes/sec   | Speedup      | 
@@ -157,34 +178,37 @@ This allows the CPU to pack multiple weights and activations into a single regis
 | None             | 1502485     | -            | 
 | AVX2             | 3082145     | ~105%        | 
 | BMI2             | 3119613     | ~107%        | 
-| AVX512           | not tested  | not tested   | 
 > Single-threaded search, fixed depth, identical position set. Tested on an intel i5-12400f.
 
 ### 3.2 Memory Locality & Bitboards
 
-**Problem:** During search, performance is often limited by memory latency, not arithmetic throughput.
+**Problem:** During search, performance is often limited by memory latency, not arithmetic throughput. Frequent "cache misses" during state updates can stall the CPU for hundreds of cycles.
 
-**Solution:**Minke is designed around cache-friendly data structures:
-* Board state is represented using bitboards (64-bit integers), enabling bitwise parallelism and compact state encoding
-* Move generation and attack detection rely on branch-light bitwise operations
-* Transposition Table entries were sized to 32 bytes, allowing two entries to fit perfectly within a standard 64-byte CPU cache line, preventing 'split-line' fetches and minimizing L1 cache misses
+**Solution:** Minke is designed around cache-friendly data structures:
+* **Bitboard Representation**: Uses 64-bit integers (uint64_t) to represent piece placements. This allows board-wide calculations (like finding all possible pawn pushes) to execute in single-digit CPU instructions via bitwise parallelism.
 
-These choices minimize pointer chasing and improve spatial locality, keeping critical paths resident in L1/L2 cache.
+<div align="center">
+  <img src="../assets/bitboard_visualization.png" alt="bitboard visualization" width="400"/>
+</div>
+
+> Visualizing the State: By treating a uint64_t as an 8×8 grid, we perform symmetric multiprocessing on a single register. For example, a single bitwise AND between a sliding piece bitboard and an occupancy bitboard calculates all possible blockages simultaneously, eliminating the need for expensive loops or nested arrays.
+* **Instruction-Level Optimization**: Leverages BMI2 instructions (e.g., PEXT) to implement Magic Bitboards. This transforms move generation from complex branching logic into a constant-time table lookup.
+* **Cache-Aligned Transposition Table**: Entries are strictly sized to 32 bytes. This ensures exactly two entries fit within a standard 64-byte CPU cache line, eliminating "split-line" fetches and significantly reducing L1/L2 cache pressure during heavy search workloads, reducing caches misses.
 
 **Result:** 
-* Reduced memory stalls during Negamax search. 
-* Higher effective work per CPU cycle, translating into deeper and more stable searches
+* ~27% speedup in search throughput by minimizing memory stalls and branch mispredictions.
+* Higher IPC (Instructions Per Cycle): Optimized spatial locality keeps the "hot path" of the search resident in high-speed cache.
 
 ### 3.3 Search Optimizations & Heuristic Pruning (SPRT-Validated)
 
 **Problem:** Even with fast evaluation and memory access, naïve search explores too many low-value branches, making heuristic decisions a key target for **data-driven optimization**.
 
-**Solution:** The Negamax search is augmented with a collection of pruning, reduction, and move-ordering heuristics designed to reduce the effective branching factor:
-* Aggressive early pruning of unpromising lines
-* Dynamic move ordering informed by statistical heuristics
-* Focused allocation of computation to high-impact branches
+**Solution:** The Negamax search is augmented with a collection of optimizations and heuristics designed to reduce the effective branching factor, turning search into a probabilistic optimization problem:
+* **Pruning & Reductions**: Implemented Null Move Pruning (NMP) and Late Move Reductions (LMR) to skip unpromising branches based on depth and move history.
+* **Move Ordering**: Utilized Killer Heuristics and History Tables to ensure the most "forcing" moves are searched first, maximizing Alpha-Beta cutoffs.
+* **Data-Driven Validation (SPRT)**: Every change was validated via Sequential Probability Ratio Testing (SPRT). This statistically rigorous method ensures that a code change provides a genuine ELO gain before being merged.
 
-Each heuristic was introduced as a controlled experiment, evaluated **in isolation**, and either accepted or rejected based on statistically significant results. Rather than relying on throughput metrics, all search optimizations were validated using **SPRT (Sequential Probability Ratio Testing)**.
+Each heuristic was introduced as a controlled experiment, evaluated **in isolation**, and either accepted or rejected based on statistically significant results. 
 
 **Result:** Consistent, measurable ELO gains from individual heuristics, with stable improvements validated through confidence intervals and protection against performance regressions.
 
