@@ -191,22 +191,11 @@ Each heuristic was introduced as a controlled experiment, evaluated **in isolati
 > **Note:** Since these optimizations primarily affect pruning behavior rather than raw throughput, **Nodes Per Second (NPS) is not a meaningful metric**. Playing strength was measured exclusively via **SPRT**, the standard and statistically rigorous methodology for chess engine evaluation.
 
 ## 4 Evaluation Engine: NNUE
-This section describes the architectural properties of NNUE that directly influenced performance and memory-layout decisions.
+This section describes the architectural properties of NNUE that directly influenced constrains and design.
 
 NNUE is the dominant per-node cost in Minke’s search pipeline. Unlike classical evaluators, its inference path introduces a non-trivial latency that is incurred millions of times during search, making evaluation throughput a primary performance concern.
 
-### 4.1 The Accumulator: O(1) Incremental Updates
-
-The secret to NNUE speed is that it bypasses the most expensive part of the forward pass, the input to hidden layer transformation, by maintaining an Accumulator.
-
-When a piece moves, the network performs incremental updates, subtracting the weights of the old square and adding the weights of the new square to the hidden layer state. This transforms a massive matrix multiplication into a few vector additions, keeping updates in the input layer cost constant and small.
-
-### 4.2 Quantization & Inference
-
-To maximize SIMD throughput, the network is quantized to 16-bit integers (QA=255,QB=64). This is a strategic trade-off: while it introduces rounding noise, it enables 16-way parallelism on 256-bit registers. The resulting increase in search depth far outweighs the slight loss in evaluation precision, increasing playing strength.
-
-### 4.3 Topology & Perspective Design
-
+### 4.1 Architecture and Topology Overview
 The network follows a (768 -> 1024)×2 -> 1 architecture:
 
 * **Input Layer**: Represents the board features (Piece-Square mapping). 64 squares x 12 pieces = 768
@@ -217,9 +206,8 @@ The network follows a (768 -> 1024)×2 -> 1 architecture:
 
 * **Output Layer**: Compresses the 2048 activated hidden neurons into a single scalar value representing the evaluation.
 
-### 4.4 Technical Architecture Diagram
 ```mermaid
- graph LR
+graph LR
     classDef default fill:#fff,stroke:#333,stroke-width:1px,color:#000;
     classDef transformer fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000;
     classDef hidden fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000;
@@ -268,20 +256,28 @@ The network follows a (768 -> 1024)×2 -> 1 architecture:
     class STM_Logic STM;
 ```
 
-### 4.5 Training Pipeline & WDL Scaling
-The NNUE training regime in Minke is designed to optimize playing strength under tournament conditions, rather than minimizing training loss. Training decisions are evaluated exclusively based on their impact on search behavior and ELO.
 
-Training follows a controlled three-stage schedule:
+### 4.2 The Accumulator: O(1) Incremental Updates
 
-* **Pre-training** on Stockfish evaluations to establish stable positional priors and accelerate convergence.
+The core design decision behind NNUE is the use of incremental accumulators. Instead of recomputing the network from scratch after each move, Minke maintains per-side accumulator vectors representing the sum of active feature contributions. When a move is made:
 
-* Data fusion using a mixed Stockfish and Leela Chess Zero (Lc0) dataset to balance tactical precision with long-horizon strategic evaluation.
+* Only the features affected by that move are updated
+* The accumulator is adjusted via vector addition/subtraction
+* The remaining network layers operate on the updated accumulator
 
-* **WDL-scaled fine-tuning**, deliberately increasing loss variance to bias the evaluator toward decisive outcomes in objectively drawn positions.
+* **Design trade-off**:
+* **Pro**: Dramatically reduces redundant computation and stabilizes evaluation cost
+* **Con**: Requires careful feature encoding and accumulator management
 
-Increasing the WDL (Win–Draw–Loss) scale intentionally worsens raw loss metrics, but consistently improves tournament performance. Empirically, this produces a "sharper" evaluation profile that encourages the search to pursue winning chances rather than settling for neutral positions.
+### 4.3 Quantization & Inference
 
-This trade-off was selected and validated through large-scale testing, reinforcing a core design principle of Minke: evaluation quality is defined by search outcomes, not proxy metrics.
+To maximize SIMD throughput, the network is **quantized to 16-bit integers** (QA=255,QB=64). 
+
+**Trade-off**: 
+* Introduces rounding noise, reducing evaluation quality
+* Enables 16-way parallelism on 256-bit registers, increasing search throughput
+
+This reflects a broader design philosophy: evaluation consistency and throughput are more valuable than marginal representational precision.
 
 ## 5 Experimentation Infrastructure & Validation
 **TL;DR**
