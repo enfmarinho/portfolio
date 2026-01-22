@@ -190,6 +190,8 @@ Each heuristic was introduced as a controlled experiment, evaluated **in isolati
 
 > **Note:** Since these optimizations primarily affect pruning behavior rather than raw throughput, **Nodes Per Second (NPS) is not a meaningful metric**. Playing strength was measured exclusively via **SPRT**, the standard and statistically rigorous methodology for chess engine evaluation.
 
+---
+
 ## 4 Evaluation Engine: NNUE
 This section describes the architectural properties of NNUE that directly influenced constrains and design.
 
@@ -279,6 +281,8 @@ To maximize SIMD throughput, the network is **quantized to 16-bit integers** (QA
 
 This reflects a broader design philosophy: evaluation consistency and throughput are more valuable than marginal representational precision.
 
+---
+
 ## 5 Experimentation Infrastructure & Validation
 **TL;DR**
 * Built a custom Rust CLI to orchestrate NNUE training, evaluation, and model iteration
@@ -319,6 +323,8 @@ Validation is tightly integrated with the development workflow, allowing changes
 
 **Why this matters:** By treating training and validation as data pipelines, Minke bridges low-level systems programming with large-scale experimentation. This approach mirrors production data-driven systems, where correctness, repeatability, and scalability are just as important as raw performance.
 
+---
+
 ## 6 Design Trade-offs & Philosophy
 **TL;DR**
 * Balanced memory usage and performance by choosing a stateful Transposition Table
@@ -331,7 +337,7 @@ Minke’s architecture reflects a series of deliberate trade-offs evaluated unde
 
 **Problem:** A naive search recalculates positions repeatedly, wasting computation. The Transposition Table (TT) can store previously evaluated positions, but introduces complexity:
 
-**Design Choice**: Minke employs a stateful, shared TT optimized for cache locality and multi-threaded access.
+**Design Choice**: Minke employs a stateful, shared TT optimized for cache locality and memory usage.
 * Reduces redundant evaluation and improves effective search speed
 * Uses cache-aligned entries to reduce cache misses and reduce memory related bottlenecks
 * Employs conservative replacement policies to preserve high-value nodes
@@ -369,12 +375,14 @@ Minke reflects a systems-oriented engineering mindset:
 * **Pragmatic tooling**: Languages and abstractions are chosen per constraint
 * **Trade-off driven**: Strength emerges from balanced systems, not isolated optimizations
 
+---
+
 ## 7 Reliability & Tooling
 **TL;DR**
 * Validated engine correctness with deterministic benchmarks
 * Ensured performance stability via automated regression tests and CI pipelines
 
-Minke is designed not just for speed, but for reproducibility and reliability. Deterministic testing allows for strong guarantees that optimizations never break correctness, even in a high-performance, multi-threaded environment.
+This section focuses on engine correctness, determinism, and long-term stability, independent of playing strength improvements. While Section 5 addresses how changes are evaluated for strength, this section describes how Minke ensures that optimizations never compromise correctness and reproducibility.
 
 ### 7.1 Deterministic Benchmarking & Correctness
 
@@ -406,4 +414,8 @@ Minke is designed not just for speed, but for reproducibility and reliability. D
 
 By relying on deterministic benchmarking and automated regression pipelines, Minke demonstrates engineering rigor without relying on conventional unit tests. This methodology ensures that high-speed optimizations never compromise correctness, perfectly aligning with systems-focused, high-performance development practices. This approach mirrors invariant-based testing techniques commonly used in high-performance databases, systems, and compilers.
 
-*End of Case Study*
+---
+
+#### End of Case Study
+* Return to [portfolio main hub](../README.md)
+* View project [source code repository](https://github.com/enfmarinho/Minke)
