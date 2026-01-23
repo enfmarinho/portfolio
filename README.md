@@ -1,100 +1,141 @@
 <div align="center">
 
 # Eduardo Marinho 
+[**GitHub**](https://github.com/enfmarinho) | [**LinkedIn**](https://linkedin.com/in/enfmarinho) | [**Email**](mailto:contact@eduardomarinho.dev)
 
-**Systems & High-Performance Software Developer**
+**Low-Level Systems & High-Performance Software Engineer**
 
 **BS in Computer Science @ Federal University of Rio Grande do Norte** (Expected Dec 2027)
 
-*Focused on high-performance systems, memory-efficient design, and data-driven engineering*
-
-[**GitHub**](https://github.com/enfmarinho) | [**LinkedIn**](https://linkedin.com/in/enfmarinho) | [**Email**](mailto:contact@eduardomarinho.dev)
-
 </div>
+
+##### About
+*I build performance-critical, real-time software systems with a focus on deterministic execution, memory efficiency, and empirical validation. My work spans low-level C/C++ systems, Rust-based tooling, and data-driven experimentation pipelines.*
+
+This portfolio highlights projects where I owned **end-to-end system design**, from architecture and low-level optimization to validation and tooling.
 
 ---
 
-## 🚀 Impact Highlights
-* **Performance:** Achieved a **~105% increase in engine throughput** through SIMD-accelerated NNUE inference compared to baseline evaluation
-* **Rank:** Developed the **2nd highest-ranked Brazilian chess engine** on the Computer Chess Rating List
-* **Scale:** Published a Rust mini-games emulator with **9,200+ downloads** on crates.io
+## Impact Highlights
+* **Real-Time Systems**: Developed a high-performance chess engine where **evaluation latency directly determines system behavior**, achieving a ~105% throughput increase through SIMD and memory-layout optimization.
+* **Production Rust**: Published a Rust engine on crates.io with **9,200+ downloads**, demonstrating production-grade software and project ownership.
+* **Empirical Engineering**: Every performance-critical change validated using **statistical testing, test suits, benchmarks, and regression detection**.
 
 ---
 
 ## Technical Case Studies
-> High-performance and systems engineering projects demonstrating concurrency, memory optimization, and low-level architecture.
-### 🛠️ Systems & Performance
 
-#### [Minke](casestudies/minke.md) | High-Performance Chess Engine
-*A NNUE-based C++ chess engine focused on search performance, memory locality and accurate position evaluation, ranked #2 on the CCRL.*
-* **Performance Engineering:** Integrated NNUE evaluation and built **SIMD-accelerated kernels** for inference, resulting in a **~105% increase in Nodes Per Second (NPS)**.
-* **Memory Optimization:** Utilized **bitboards** and **cache-efficient layouts** to achieve a **~27% speedup** in negamax search.
-* **Automation & Validation:** Orchestrated a distributed testing framework and CI/CD workflows to continuously validate engine correctness and performance regressions; developed a custom Rust CLI to automate NN training and monitoring.
-* **Full Case Study:** [Read here](casestudies/minke.md) for detailed architecture, heuristics, training pipeline, and data-driven validation.
+> These case studies emphasize systems design under constraints where latency, determinism, and failure modes directly affect behavior.
 
-#### [Tgames](https://github.com/enfmarinho/tgames) | Asynchronous Rust UI Engine
-*A high-performance terminal UI engine designed for modularity and speed.*
-* **Concurrency:** Architected a state-driven engine enabling **asynchronous input** and rendering for a suite of 5 interactive games.
-* **Production Standards:** Published on crates.io with **9,200+ downloads**, demonstrating real-world adoption and production-quality code.
-* **Design:** Applied the **Template Method pattern** with Rust traits and enums to ensure long-term maintainability and easy extension.
+### Systems & Performance
+---
+#### Minke | High-Performance Chess Engine
+*C++ (core engine), Rust (tooling), SIMD-vectorized x86-64 and Neon kernels, concurrency*
+> **[Full Case Study](casestudies/minke.md)**
+>
+>**[Source Code](https://github.com/enfmarinho/Minke)**
 
-#### Compiler Prototype (Comp) | C++, Flex, Bison
+Performance-critical system where microsecond-level latency drives overall behavior. While the domain is chess, the engineering challenges closely resemble control and automation systems:
+* Tight inner loops executed millions of times per second
+* Strong sensitivity to cache behavior and memory layout
+* Deterministic execution under real-time constraints
+* Continuous validation to prevent regressions
+
+**Highlights**
+* Designed SIMD-accelerated NNUE inference (AVX2, AVX512, NEON), doubling evaluation throughput.
+* Engineered cache-aligned data structures and bitboard-based state representation, reducing memory stalls and branch misprediction.
+* Built a Rust-based orchestration CLI to manage training, benchmarking, and validation as a reproducible pipeline.
+* Validated search behavior and performance using deterministic benchmarks and distributed testing.
+
+---
+
+#### Tgames | Asynchronous Rust TUI Engine
+*Rust, Concurrency, Software Engineering and Design*
+<!-- > **[Full Case Study](casestudies/minke.md)** -->
+<!-- > -->
+> **[Source Code](https://github.com/enfmarinho/tgames)**
+
+Tgames is a terminal-based Rust engine structured around a deterministic update loop that separates input handling, state updates, and rendering. This design enables non-blocking input processing while preserving predictable execution order and state transitions under concurrent workloads.
+
+**Key engineering properties:**
+* Deterministic update and render ordering
+* Explicit state model with clear ownership boundaries
+* Concurrency-safe, non-blocking input handling
+* Trait-based abstractions enabling extensibility without runtime modification
+
+---
+
+#### Compiler Prototype (Comp) 
+*C++, Flex, Bison*
+
 *A compiler designed as a multi-stage lowering pipeline from a custom language into C Three Address Code (TAC).*
 * **Language Design:** Developed a linear IR to simplify expression lowering and support backend code generation.
 * **Semantic Analysis:** Implemented passes for **symbol table construction** and **static type checking** to ensure program correctness prior to lowering.
 * **Code Generation:** Engineered a backend that translates **Three-Address Code (TAC)** into portable C for integration with GCC/Clang.
 
-### 💾 Backend & Data Pipelines
+---
 
-#### EchoTyper | Scalable Data Pipelines
-*An AI-powered web application for automated transcription, summarization and organization of meetings.*
-* **API Architecture:** Designed a RESTful backend using Spring Boot to orchestrate multi-stage transcription and summarization pipelines with external ML services (Google STT, Gemini).
-* **Service Abstraction:** Implemented the **Strategy design pattern** to abstract LLM providers, creating a modular system that reduced code duplication and allows easy service switching.
-* **Database:** Architected a data pipeline that persists meetings transcription and summarization metadata in Postgres, handling schema design for multi-stage LLM output
-* **Optimization:** Reduced token usage by **12%** while improving output quality through fine-tuned summarization prompts.
+### Computer Vision & Applied Research
+---
+
+### Pasture Biomass 
+*PyTorch, TorchVision, Pandas, sklearn*
+
+* **Pasture Biomass Prediction:** Leveraged Vision Transformers (DINOv2) and multitask learning with multiple regression heads to develop a **computer vision** model to predict biomass components. Developed inference pipelines with ensemble prediction and test-time augmentation (TTA), improving model accuracy by ~11%.
+
+* **Cardiovascular Research:** Collaborated on **computer vision** projects applying deep learning to diagnose disease, specifically developing data preparation pipelines to reduce noise and optimize feature extraction.
+
+#### Cardiovascular Diagnostic Research | Image Processing
+* **Pipeline Design**: Engineered data preparation and denoising pipelines for medical imaging datasets to optimize feature extraction for deep learning models.
+* **Research Focus**: Collaborated on multi-disciplinary teams to bridge the gap between clinical requirements and automated medical diagnostics.
 
 ---
 
-## 🤖 Applied ML & Scientific Research
-* **Pasture Biomass Prediction:** Leveraged Vision Transformers (DINOv2) and multitask learning with multiple regression heads to predict biomass components. Developed automated ML pipelines with ensemble prediction and test-time augmentation (TTA), improving model accuracy by ~11%.
+### Backend & Data Pipelines
 
-* **Cardiovascular Research:** Collaborated on computer vision projects applying deep learning to diagnose disease, specifically developing data preparation pipelines to reduce noise and optimize feature extraction.
+#### EchoTyper | Multi-Stage Data Orchestration
+*Spring Boot, PostgreSQL, Design patterns and Software Architecture*
+
+* **Pipeline Design**: Architected a multi-stage backend to orchestrate data flow between external ML services and persistent storage, ensuring high availability and system modularity.
+* **Service Abstraction**: Implemented the Design Patterns to decouple core logic from external API providers, a design choice aimed at reducing vendor lock-in and reduce code duplication.
+* **Database:** Data pipeline that persists meetings transcription and summarization metadata in Postgres
 
 ---
 
-## 🧰 Technical Toolbox
+## Technical Toolbox
 
-### Systems & Core Languages
-* C/C++: low-level systems programming, memory layout, performance-critical paths
-* Rust: memory-safe concurrent systems, tooling, and automation pipelines
-* Go: backend services, data processing, internal tools, concurrency
-* Python: scientific computing, ML pipelines, data analysis
-* SQL: structured data modeling and querying
-> Philosophy: Prioritizing memory efficiency, performance-critical paths, and deterministic execution.
+### Languages
+* **C / C++**: Real-time systems, memory layout optimization and tooling
+* **Rust**: Memory-safe systems programming and automation tooling (familiar with memory safety and ownership models).
+* **Python**: Data analysis, ML pipelines, and rapid hardware/software prototyping.
 
-### Backend, Tooling & Data Pipelines
-
-* Backend Frameworks: Spring Boot (service orchestration), custom Rust CLIs
-* Data & ML: PyTorch, TorchVision, scikit-learn, Bullet ML
-* Data Pipelines: dataset preprocessing, validation, experiment orchestration
-* Serialization & Interfaces: structured data schemas, versioned model artifacts
-    
-### Developer & Systems Tooling
-
-* Build & Debug: CMake, Make, GDB/LLDB, Valgrind
-* Automation & CI: Git, GitHub Actions, CI/CD pipelines, regression testing, distributed validation
-* Infrastructure: Docker, Linux/Unix, Git, Google Cloud Platform
-
-### Systems & Software Foundations
-
-* Operating Systems: processes, memory management, scheduling
-* Computer Architecture: caches, SIMD, instruction-level performance
-* Concurrent Programming: multi-threading, synchronization, determinism, non blocking I/O
-* Databases: schema design, persistence, query performance
-* Software Architecture: modular systems, trade-offs, maintainability
 ---
 
-### 📖 Technical Philosophy
-I focus on building reliable, maintainable, and high-performance software systems. My work emphasizes memory efficiency, concurrency, and predictable performance, informed by both practical experience and study of foundational texts like Designing Data-Intensive Applications and Design Patterns. I approach every project as a learning opportunity to understand system trade-offs, from algorithm design to data flow and infrastructure. Whether optimizing a search engine in C++ or architecting asynchronous Rust applications, my goal is to deliver software that performs efficiently under real-world constraints and scales gracefully over time.
+### Computer Architecture & Low-Level Systems & Embedded Systems
+* **Hardware Awareness**: Deep understanding of CPU cache hierarchies (L1/L2/L3), memory locality, and Instruction-Level Parallelism.
+* **Operating Systems**: Experience with Linux/Unix environments, process management, and concurrency programming.
+* **SIMD intrinsics**: Implementation of hand-tuned kernels using AVX2, AVX-512, and NEON intrinsics to maximize throughput.
+* **Tooling**: Build systems (CMake/Make), debuggers (GDB/LLDB), and memory profilers (Valgrind).
+* **Control & Robotics**: Familiarity with feedback loops, state-space search, and trajectory optimization concepts.
+
+---
+
+### Software/Data Engineering & Infrastructure
+* **Software Architecture**: structural and behavioral patterns to architect modular systems and hardware-abstraction layers, enabling clean separation between high-level logic and low-level driver implementations.
+* **Data Pipelines**: Architecting reproducible pipelines in Python and Rust for capturing and analyzing complex process data.
+* **Empirical Validation**: Statistical engine evaluation (SPRT), deterministic benchmarking, and regression detection to ensure system correctness.
+* **CI/CD & Infrastructure**: Building automated testing pipelines with GitHub Actions, Docker, and distributed validation frameworks.
+
+---
+
+### Engineering Philosophy
+
+I approach software as a system, not isolated code. My design decisions are guided by:
+
+* Measurable performance, not assumptions
+* Explicit trade-offs between latency, throughput, and complexity
+* Tooling that enables fast iteration without sacrificing correctness
+
+My goal is to deliver software that performs efficiently under real-world constraints and scales gracefully over time.
 
 ---
