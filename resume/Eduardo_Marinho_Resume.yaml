@@ -1,0 +1,287 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/rendercv/rendercv/refs/tags/v2.5/schema.json
+
+.project_definitions:
+    comp: &comp
+      - name: "Comp | C++, Flex, Bison, Make, Git"
+        date: 
+        start_date: 2025-03
+        end_date: 2025-07
+        highlights:  
+          - "Constructed a compiler prototype using Flex and Bison to **lower a custom language** into Three-Address Code (TAC)."
+          - Developed code-generation backend that translates TAC into portable C enabling integration with **GCC/Clang toolchains** for **hardware-specific cross-compilation.**
+          - Designed a linear **Intermediate Representation** (IR) to support IR-level optimizations, mirroring the logic used in firmware to **minimize instruction count and memory footprint.**
+          - Executed **semantic analysis passes**, including symbol table construction and static type checking, **ensuring program correctness** prior to IR lowering.
+    echotyper: &echotyper
+      - name: "EchoTyper | Java, Spring Boot, Node.js, Postgres, Maven, Docker, Git"
+        date: 
+        start_date: 2025-04
+        end_date: 2025-07
+        location:
+        highlights:
+          - "**Owned the end-to-end lifecycle** of a scalable RESTful API using Spring Boot, orchestrating a real-time transcription and summarization pipeline integrating Google Cloud Speech-to-Text and Gemini LLM."
+          - "**Led a 3-person Agile team**, driving technical discussions and peer code reviews to ensure high-quality code."
+          - Optimized LLM workflows by engineering **fine-tuned prompts**, achieving a **12% reduction in token consumption** while improving summary quality.
+    minke: &minke
+      - name: "[Minke](https://github.com/enfmarinho/Minke) | C++, Rust, Bullet ML Framework, CMake, Make, Git"
+        date:
+        start_date: 2024-05
+        end_date: present
+        location:
+        highlights:
+          - Attained **\#2 ranking** among Brazilian chess engines on the Computer Chess Rating List (CCRL).
+          - Engineered **SIMD-vectorized kernels** for **x86 and ARM** architectures to optimize neural network inference and integrated NNUE network evaluation, **increasing search throughput by +105%** and **engine strength by +75%.**
+          - Optimised the search engine by implementing bitboard representations and cache-efficient memory layouts, achieving a **27% speedup** in negamax algorithm.
+          - Analyzed performance and memory profiles using **LLDB and Valgrind**, debugging and ensuring stable execution of high-concurrency algorithms.
+    tgames: &tgames
+      - name: "[Tgames](https://github.com/enfmarinho/tgames) | Rust, Cargo, Git"
+        date: 
+        start_date: 2024-02
+        end_date: 2024-04
+        location:
+        highlights:
+          - Architected a **high-performance** terminal UI engine in Rust, enabling **asynchronous input** and state-driven rendering for a suite of 5 mini-games.
+          - Published on crates.io with **9,200+ downloads**, demonstrating real-world adoption and production-quality code.
+          - Designed a **modular architecture** using Rust traits and enums, applying design patterns to ensure the system is **extensible** and **fault-tolerant.**
+    pastureBiomass: &pastureBiomass
+      - name: "Pasture Biomass Prediction | Python, PyTorch, Vision Transformers"
+        date:
+        start_date: 2025-10
+        end_date: present
+        location:
+        highlights:
+          - Engineered an **automated ML and inference pipeline** integrating ensemble prediction and Test Time Augmentation (TTA), **improving accuracy by 11%.**
+          - Incorporated a pre-trained **DINOv2 Vision Transformer (ViT-S/14)** as backbone with a **shared feature extractor** and 4 auxiliary heads to automate biomass estimation from ground images.
+          - Leveraged **multitask learning** with auxiliary metadata to improve generalization, validated via 5-fold cross-validation.
+
+cv:
+  name: Eduardo Marinho
+  headline:
+  email: contact@eduardomarinho.dev
+  social_networks:
+    - network: LinkedIn
+      username: enfmarinho
+    - network: GitHub
+      username: enfmarinho
+  phone: +55 84 99112-0800
+  custom_connections:
+  sections:
+    education:
+      - institution: Federal University of Rio Grande do Norte
+        area: Computer Science
+        degree: BS
+        date:
+        start_date: 2023-01
+        end_date: present
+        location: RN, Brazil
+        summary:
+        highlights:
+          - Expected graduation date December 2027
+          - "**Systems Coursework**: Embedded Systems, Computer Architecture, OS, Computer Organization, Computer Vision"
+    experience:
+      - company: Federal University of Rio Grande do Norte
+        position: Undergraduate Research Assistant
+        date:
+        start_date: 2023-06
+        end_date: 2024-04
+        location: RN, Brazil
+        summary: 
+        highlights:
+          - Collaborated with the development of automated cardiovascular diagnosis tools by applying Deep Learning and **Computer Vision** algorithms to medical datasets.
+          - Refined data preparation pipelines by implementing noise reduction and feature extraction techniques, enhancing training data quality on **resource contrained hardware**.
+    projects:
+      - <<: *minke
+      - <<: *comp
+      - <<: *tgames
+      - <<: *pastureBiomass
+    Skills:
+      - label: Languages
+        details: C/C++, **Rust**, Python, Java, Bash
+      - label: CS Fundamentals
+        details: Operating Systems, Data Structures & Algorithms, Object-Oriented Design, Concurrent Programming
+      - label: Expertise
+        details: "**Low-Level Systems Programming, Embedded Systems**, Computer Architecture, **SIMD Optimization**"
+      - label: Tools
+        details: Git, **Linux, GDB/LLDB, Valgrind, CMake**, GoogleTest, Make, GCP, **PyTorch, TorchVision, OpenCV**
+
+design:
+  theme: sb2nov
+  page:
+    size: us-letter
+    top_margin: 0.3in
+    bottom_margin: 0.1in
+    left_margin: 0.4in
+    right_margin: 0.4in
+    show_footer: false
+    show_top_note: false
+  colors:
+    body: rgb(0, 0, 0)
+    name: rgb(0, 0, 0)
+    headline: rgb(0, 0, 0)
+    connections: rgb(0, 0, 0)
+    section_titles: rgb(0, 0, 0)
+    links: rgb(0, 0, 0)
+    footer: rgb(128, 128, 128)
+    top_note: rgb(128, 128, 128)
+  typography:
+    line_spacing: 0.6em
+    alignment: justified
+    date_and_location_column_alignment: right
+    font_family:
+      body: New Computer Modern
+      name: New Computer Modern
+      headline: New Computer Modern
+      connections: New Computer Modern
+      section_titles: New Computer Modern
+    font_size:
+      body: 10pt
+      name: 25pt
+      headline: 10pt
+      connections: 10pt
+      section_titles: 1.6em
+    small_caps:
+      name: false
+      headline: false
+      connections: false
+      section_titles: false
+    bold:
+      name: true
+      headline: false
+      connections: false
+      section_titles: true
+  links:
+    underline: true
+    show_external_link_icon: true
+  header:
+    alignment: center
+    photo_width: 3.5cm
+    photo_position: left
+    photo_space_left: 0.4cm
+    photo_space_right: 0.4cm
+    space_below_name: 0.4cm
+    space_below_headline: 0.4cm
+    space_below_connections: 0.7cm
+    connections:
+      phone_number_format: international
+      hyperlink: true
+      show_icons: true
+      display_urls_instead_of_usernames: true
+      separator: •
+      space_between_connections: 0.4cm
+  section_titles:
+    type: with_full_line
+    line_thickness: 0.6pt
+    space_above: 0.5cm
+    space_below: 0.3cm
+  sections:
+    allow_page_break: true
+    space_between_regular_entries: 1.0em
+    space_between_text_based_entries: 0.3em
+    show_time_spans_in: []
+  entries:
+    date_and_location_width: 4.15cm
+    side_space: 0.2cm
+    space_between_columns: 0.1cm
+    allow_page_break: false
+    short_second_row: false
+    summary:
+      space_above: 0cm
+      space_left: 0cm
+    highlights:
+      bullet: ◦
+      nested_bullet: ◦
+      space_left: 0.15cm
+      space_above: 0.00cm
+      space_between_items: 0cm
+      space_between_bullet_and_text: 0.5em
+  templates:
+    footer: "*NAME -- PAGE_NUMBER/TOTAL_PAGES*"
+    top_note: "*LAST_UPDATED CURRENT_DATE*"
+    single_date: MONTH_ABBREVIATION YEAR
+    date_range: START_DATE – END_DATE
+    time_span: HOW_MANY_YEARS YEARS HOW_MANY_MONTHS MONTHS
+    one_line_entry:
+      main_column: "**LABEL:** DETAILS"
+    education_entry:
+      main_column: |-
+        **INSTITUTION**
+        *DEGREE* *in* *AREA*
+        SUMMARY
+        HIGHLIGHTS
+      degree_column:
+      date_and_location_column: |-
+        *LOCATION*
+        *DATE*
+    normal_entry:
+      main_column: |-
+        **NAME**
+        SUMMARY
+        HIGHLIGHTS
+      date_and_location_column: |-
+        *LOCATION*
+        *DATE*
+    experience_entry:
+      main_column: |-
+        **POSITION**
+        *COMPANY*
+        SUMMARY
+        HIGHLIGHTS
+      date_and_location_column: |-
+        *LOCATION*
+        *DATE*
+    publication_entry:
+      main_column: |-
+        **TITLE**
+        SUMMARY
+        AUTHORS
+        URL (JOURNAL)
+      date_and_location_column: DATE
+locale:
+  language: english
+  last_updated: Last updated in
+  month: month
+  months: months
+  year: year
+  years: years
+  present: present
+  month_abbreviations:
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sept
+    - Oct
+    - Nov
+    - Dec
+  month_names:
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December
+settings:
+  current_date: "2025-12-22"
+  render_command:
+    design:
+    locale:
+    typst_path: rendercv_output/NAME_IN_SNAKE_CASE_Resume.typ
+    pdf_path: NAME_IN_SNAKE_CASE_Resume.pdf
+    markdown_path: README.md
+    html_path: rendercv_output/NAME_IN_SNAKE_CASE_Resume.html
+    png_path: rendercv_output/NAME_IN_SNAKE_CASE_Resume.png
+    dont_generate_markdown: false
+    dont_generate_html: true
+    dont_generate_typst: false
+    dont_generate_pdf: false
+    dont_generate_png: true
+  bold_keywords: []
