@@ -75,7 +75,18 @@ Tgames is a terminal-based Rust engine structured around a deterministic update 
 
 ---
 
+#### [Ducta](https://github.com/enfmarinho/ducta) | High-Throughput HTTP Server (Work-in-Progress)
+*Rust, Linux (io_uring/epoll), Zero-copy, Event-driven Design*
+
+Early-stage project exploring high-throughput Linux networking in Rust. Focused on:
+- Asynchronous I/O with io_uring and epoll
+- Zero-copy request parsing for minimal latency
+- Custom router for high concurrency
+
+---
+
 ### Computer Vision & Applied Research
+
 ---
 
 ### Pasture Biomass 
