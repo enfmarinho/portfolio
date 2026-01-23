@@ -1,4 +1,4 @@
-# Eduardo Marinho's CV
+# Eduardo Marinho
 
 - Phone: +55 84 99112 0800
 - Email: [contact@eduardomarinho.dev](mailto:contact@eduardomarinho.dev)
@@ -7,7 +7,9 @@
 
 
 # Education
-## **Federal University of Rio Grande do Norte***RN, Brazil*
+## **Federal University of Rio Grande do Norte**
+
+*RN, Brazil*
 
 *Jan 2023 – present*
 
