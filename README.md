@@ -73,6 +73,13 @@ Tgames is a terminal-based Rust engine structured around a deterministic update 
 * **Semantic Analysis:** Implemented passes for **symbol table construction** and **static type checking** to ensure program correctness prior to lowering.
 * **Code Generation:** Engineered a backend that translates **Three-Address Code (TAC)** into portable C for integration with GCC/Clang.
 
+#### NoC Simulator 
+*C++ | SystemC*
+
+- Built a cycle-accurate 2D mesh Network-on-Chip simulator with deadlock-free routing, arbitration, and flow control.
+- Implemented virtual-cut-through routers with round-robin arbitration, crossbar switching, and FIFO buffering.
+- Verified correctness and performance using automated testbenches and VCD waveform analysis.
+
 ---
 
 #### [Ducta](https://github.com/enfmarinho/ducta) | High-Throughput HTTP Server (Work-in-Progress)
