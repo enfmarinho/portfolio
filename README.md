@@ -30,7 +30,7 @@ This portfolio highlights projects where I owned **end-to-end system design**, f
 ### Systems & Performance
 ---
 #### Minke | High-Performance Chess Engine
-*C++ (core engine), Rust (tooling), SIMD-vectorized x86-64 and Neon kernels, concurrency*
+*C++ (core engine) | Rust (tooling) | SIMD-vectorized x86-64 and Neon kernels | concurrency*
 > **[Full Case Study](casestudies/minke.md)**
 >
 >**[Source Code](https://github.com/enfmarinho/Minke)**
@@ -42,7 +42,7 @@ Performance-critical system where microsecond-level latency drives overall behav
 * Continuous validation to prevent regressions
 
 **Highlights**
-* Designed SIMD-accelerated NNUE inference (AVX2, AVX512, NEON), doubling evaluation throughput.
+* Designed SIMD-accelerated kernels for neural network inference (AVX2, AVX512, NEON), doubling evaluation throughput.
 * Engineered cache-aligned data structures and bitboard-based state representation, reducing memory stalls and branch misprediction.
 * Built a Rust-based orchestration CLI to manage training, benchmarking, and validation as a reproducible pipeline.
 * Validated search behavior and performance using deterministic benchmarks and distributed testing.
@@ -50,7 +50,7 @@ Performance-critical system where microsecond-level latency drives overall behav
 ---
 
 #### Tgames | Asynchronous Rust TUI Engine
-*Rust, Concurrency, Software Engineering and Design*
+*Rust | Concurrency | Software Engineering and Design*
 <!-- > **[Full Case Study](casestudies/minke.md)** -->
 <!-- > -->
 > **[Source Code](https://github.com/enfmarinho/tgames)**
@@ -66,7 +66,7 @@ Tgames is a terminal-based Rust engine structured around a deterministic update 
 ---
 
 #### Compiler Prototype (Comp) 
-*C++, Flex, Bison*
+*C++ | Flex | Bison*
 
 *A compiler designed as a multi-stage lowering pipeline from a custom language into C Three Address Code (TAC).*
 * **Language Design:** Developed a linear IR to simplify expression lowering and support backend code generation.
@@ -76,7 +76,7 @@ Tgames is a terminal-based Rust engine structured around a deterministic update 
 ---
 
 #### [Ducta](https://github.com/enfmarinho/ducta) | High-Throughput HTTP Server (Work-in-Progress)
-*Rust, Linux (io_uring/epoll), Zero-copy, Event-driven Design*
+*Rust | Linux (io_uring/epoll) | Zero-copy | Event-driven Design*
 
 Early-stage project exploring high-throughput Linux networking in Rust. Focused on:
 - Asynchronous I/O with io_uring and epoll
@@ -90,11 +90,14 @@ Early-stage project exploring high-throughput Linux networking in Rust. Focused 
 ---
 
 ### Pasture Biomass 
-*PyTorch, TorchVision, Pandas, sklearn*
+*PyTorch | TorchVision | Pandas | sklearn*
 
-* **Pasture Biomass Prediction:** Leveraged Vision Transformers (DINOv2) and multitask learning with multiple regression heads to develop a **computer vision** model to predict biomass components. Developed inference pipelines with ensemble prediction and test-time augmentation (TTA), improving model accuracy by ~11%.
+Automated computer vision pipeline to predict biomass components from ground-level imagery. The system utilizes a state-of-the-art Vision Transformer (ViT) backbone to achieve high-precision estimation in agricultural environments.
 
-* **Cardiovascular Research:** Collaborated on **computer vision** projects applying deep learning to diagnose disease, specifically developing data preparation pipelines to reduce noise and optimize feature extraction.
+* **Backbone Architecture**: pre-trained DINOv2 (ViT−S/14) as the primary feature extractor.
+* **Multitask Learning**: Designed a shared backbone architecture with 4 auxiliary heads to automate simultaneous biomass estimation tasks.
+* **Performance Optimization**: Improved model accuracy by 11% through the implementation of ensemble prediction and Test Time Augmentation (TTA).
+* **Robust Validation**: Leveraged multitask learning with auxiliary metadata and validated results via 5-fold cross-validation to ensure generalization.
 
 #### Cardiovascular Diagnostic Research | Image Processing
 * **Pipeline Design**: Engineered data preparation and denoising pipelines for medical imaging datasets to optimize feature extraction for deep learning models.
@@ -105,7 +108,7 @@ Early-stage project exploring high-throughput Linux networking in Rust. Focused 
 ### Backend & Data Pipelines
 
 #### EchoTyper | Multi-Stage Data Orchestration
-*Spring Boot, PostgreSQL, Design patterns and Software Architecture*
+*Spring Boot | PostgreSQL | Design patterns and Software Architecture*
 
 * **Pipeline Design**: Architected a multi-stage backend to orchestrate data flow between external ML services and persistent storage, ensuring high availability and system modularity.
 * **Service Abstraction**: Implemented the Design Patterns to decouple core logic from external API providers, a design choice aimed at reducing vendor lock-in and reduce code duplication.
