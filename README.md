@@ -129,7 +129,7 @@ Automated computer vision pipeline to predict biomass components from ground-lev
 * **Hardware Awareness**: Deep understanding of CPU cache hierarchies (L1/L2/L3), memory locality, and Instruction-Level Parallelism.
 * **Operating Systems**: Experience with Linux/Unix environments, process management, and concurrency programming.
 * **SIMD intrinsics**: Implementation of hand-tuned kernels using AVX2, AVX-512, and NEON intrinsics to maximize throughput.
-* **Tooling**: Build systems (CMake/Make), debuggers (GDB/LLDB), and memory profilers (Valgrind).
+* **Tooling**: Build systems (CMake/Make), debuggers (GDB/LLDB), memory profilers (Valgrind) and profilers (perf).
 * **Control & Robotics**: Familiarity with feedback loops, state-space search, and trajectory optimization concepts.
 
 ---
