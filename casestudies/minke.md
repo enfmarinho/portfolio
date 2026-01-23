@@ -1,6 +1,6 @@
 # [Minke](https://github.com/enfmarinho/Minke) | High-Performance Chess Engine
 
-**Minke** is a high-performance C++ chess engine using **NNUE evaluation** and **SIMD-accelerated kernels**, ranked as the second strongest Brazilian engine on the Computer Chess Rating List (CCRL). It was designed as a testbed for exploring **memory-efficient data structures, performance engineering, and optimization techniques**. This case study focuses on **systems-level design, performance engineering, and data-driven validation**.
+Minke is a high-performance C++ chess engine designed as a testbed for **systems-level engineering**. While the domain is chess, the project focuses on challenges common to real-time and embedded systems: **optimizing latency-critical loops, memory-efficient data structures, deterministic execution, and scalable performance validation**.
 
 ---
 
@@ -92,13 +92,13 @@ graph LR
 
 The engine follows a tightly coupled search–evaluation loop, illustrated in the architecture diagram above.
 
-* **State Representation**: Game state is represented using bitboards, enabling cache-friendly move generation and constant-time make/unmake operations with minimal per-node overhead.
+* **State Representation**: Game state is represented using bitboards, enabling cache-friendly move generation and state updates. This mirrors **low-latency data structures in high-performance or embedded systems**.
 
-* **Search Loop**: performs a Negamax search with alpha-beta pruning. Under realistic branching factors, evaluation is invoked millions of times, making evaluation latency the dominant contributor to overall throughput.
+* **Search Loop**: Performs a Negamax search with alpha-beta pruning, evaluating millions of positions per second. Similar to a **real-time control loop**, it requires deterministic execution, careful memory access, and efficient handling of high-frequency operations.
 
-* **Evaluation Model**: Position evaluation uses an Efficiently Updatable Neural Network (NNUE), where only neurons affected by a move are incrementally updated. Despite this optimization, NNUE inference remains the primary per-node cost.
+* **Evaluation Model**: Uses an Efficiently Updatable Neural Network (NNUE), where only neurons affected by a move are incrementally updated. Incremental updates trade implementation complexity for consistent and predictable latency, a key requirement in real-time systems.
 
-* **Hardware-Level Optimization**: To mitigate this bottleneck, NNUE inference is implemented using SIMD, 16-bit quantized kernels, maximizing instruction-level parallelism and cache efficiency.
+* **Hardware-Level Optimization**: NNUE inference is implemented using SIMD and 16-bit quantized kernels, maximizing instruction-level parallelism and cache efficiency. This mirrors **critical compute kernel optimization in real-time software**, balancing throughput, latency, and resource usage.
 
 ---
 
