@@ -87,7 +87,7 @@ cv:
         summary: 
         highlights:
           - Collaborated with the development of automated cardiovascular diagnosis tools by applying Deep Learning and **Computer Vision** algorithms to medical datasets.
-          - Refined data preparation pipelines by implementing noise reduction and feature extraction techniques, enhancing training data quality on **resource contrained hardware**.
+          - Refined data preparation pipelines by implementing noise reduction and feature extraction techniques, enhancing training data quality on **resource constrained hardware**.
     projects:
       - <<: *minke
       - <<: *comp
