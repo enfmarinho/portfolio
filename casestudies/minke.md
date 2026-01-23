@@ -8,10 +8,9 @@
 1. [Challenge](#1-challenge)
 2. [Core Architecture Overview](#2-core-architectural-overview)
 3. [Performance Engineering](#3-performance-engineering)
-4. [Evaluation Engine: NNUE](#4-evaluation-engine-nnue)
-5. [Experimentation Infrastructure & Validation](#5-experimentation-infrastructure--validation)
-6. [Design Trade-offs & Philosophy](#6-design-trade-offs--philosophy)
-7. [Reliability & Tooling](#7-reliability--tooling)
+4. [Experimentation Infrastructure & Validation](#5-experimentation-infrastructure--validation)
+5. [Design Trade-offs & Philosophy](#6-design-trade-offs--philosophy)
+6. [Reliability & Tooling](#7-reliability--tooling)
 
 ---
 
@@ -190,100 +189,21 @@ Each heuristic was introduced as a controlled experiment, evaluated **in isolati
 
 > **Note:** Since these optimizations primarily affect pruning behavior rather than raw throughput, **Nodes Per Second (NPS) is not a meaningful metric**. Playing strength was measured exclusively via **SPRT**, the standard and statistically rigorous methodology for chess engine evaluation.
 
----
+### 3.4 Evaluation Engine: NNUE
 
-## 4 Evaluation Engine: NNUE
-This section describes the architectural properties of NNUE that directly influenced constrains and design.
+**Problem**: NNUE is the dominant per-node cost in Minke’s search pipeline. Unlike classical evaluators, its inference path introduces a non-trivial latency that is incurred millions of times during search, making evaluation throughput a primary performance concern.
 
-NNUE is the dominant per-node cost in Minke’s search pipeline. Unlike classical evaluators, its inference path introduces a non-trivial latency that is incurred millions of times during search, making evaluation throughput a primary performance concern.
+**Solution:**
+* **Incremental Accumulators**: Maintains per-side feature sums; only features affected by a move are updated. This approach drastically reduces redundant computation.
+* **SIMD-Accelerated Kernels**: Evaluation kernels are implemented with AVX2/AVX512 (x86-64) and NEON (ARM) intrinsics, processing multiple weights simultaneously to maximize instruction-level parallelism.
+* **16-bit Quantization**: Network weights are quantized, trading minor precision loss for significant vectorization gains.
+* **Memory Layout Optimization**: Inputs and accumulators are stored in cache-aligned, contiguous arrays to minimize stalls and branch mispredictions.
 
-### 4.1 Architecture and Topology Overview
-The network follows a (768 -> 1024)×2 -> 1 architecture:
-
-* **Input Layer**: Represents the board features (Piece-Square mapping). 64 squares x 12 pieces = 768
-
-* **Perspective Layer (1024 x 2)**: Two identical hidden layers that represent the board from the perspective of the side-to-move and the opponent. This allows the engine to maintain symmetry in evaluation for both players.
-
-* **Activation**: Uses a Squared Clipped ReLU activation, which provides a smoother gradient than standard ReLU while remaining computationally cheap for integer-based SIMD units.
-
-* **Output Layer**: Compresses the 2048 activated hidden neurons into a single scalar value representing the evaluation.
-
-```mermaid
-graph LR
-    classDef default fill:#fff,stroke:#333,stroke-width:1px,color:#000;
-    classDef transformer fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000;
-    classDef hidden fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000;
-    classDef head fill:#dcedc8,stroke:#33691e,stroke-width:2px,color:#000;
-    classDef STM fill:#fce4ec,stroke:#880e4f,stroke-width:2px,color:#000;
-
-    subgraph Input ["Input Layer"]
-        F1[Piece-Square Features: 768]
-    end
-
-    subgraph FT ["Feature Transformer"]
-        direction LR
-        W_Acc[White Perspective: 1024]
-        B_Acc[Black Perspective: 1024]
-    end
-
-    STM_Logic{Side to Move?}
-
-    subgraph Hidden ["Perspective Layer"]
-        direction TB
-        Concat[Concat Feature Transformers: Us + Them]
-        ACT[SCRELU Activation]
-    end
-
-    subgraph Head ["Output Head"]
-        L3[Linear Layer: 1 Neuron]
-        Final([Evaluation Score])
-    end
-
-    F1 -->|Incremental Update| W_Acc
-    F1 -->|Incremental Update| B_Acc
-    
-    W_Acc -.-> STM_Logic
-    B_Acc -.-> STM_Logic
-    
-    STM_Logic -->|White to Move| Concat
-    STM_Logic -->|Black to Move| Concat
-    
-    Concat --> ACT
-    ACT --> L3
-    L3 --> Final
-
-    class W_Acc,B_Acc FT;
-    class Concat,ACT Hidden;
-    class L3,Final Head;
-    class STM_Logic STM;
-```
-
-
-### 4.2 The Accumulator: O(1) Incremental Updates
-
-The core design decision behind NNUE is the use of incremental accumulators. Instead of recomputing the network from scratch after each move, Minke maintains per-side accumulator vectors representing the sum of active feature contributions. When a move is made:
-
-* Only the features affected by that move are updated
-* The accumulator is adjusted via vector addition/subtraction
-* The remaining network layers operate on the updated accumulator
-
-* **Design trade-off**:
-* **Pro**: Dramatically reduces redundant computation and stabilizes evaluation cost
-* **Con**: Requires careful feature encoding and accumulator management
-
-### 4.3 Quantization & Inference
-
-To maximize SIMD throughput, the network is **quantized to 16-bit integers** (QA=255,QB=64). 
-
-**Trade-off**: 
-* Introduces rounding noise, reducing evaluation quality
-* Enables 16-way parallelism on 256-bit registers, increasing search throughput
-
-This reflects a broader design philosophy: evaluation consistency and throughput are more valuable than marginal representational precision.
+**Result:** These optimizations roughly **doubled evaluation throughput**, reducing latency bottlenecks and enabling deeper search and more reliable real-time performance across millions of evaluations
 
 ---
 
-## 5 Experimentation Infrastructure & Validation
+## 4 Experimentation Infrastructure & Validation
 **TL;DR**
 * Built a custom Rust CLI to orchestrate NNUE training, evaluation, and model iteration
 * Used distributed testing to validate performance and detect regressions at scale
@@ -291,7 +211,7 @@ This reflects a broader design philosophy: evaluation consistency and throughput
 
 While the chess engine itself is performance-critical, its strength ultimately depends on a reliable and repeatable training and validation pipeline to perform incremental improvements. For that, experimentation and validation is treated as a first-class engineering and data-driven system.
 
-### 5.1 Training Orchestration
+### 4.1 Training Orchestration
 
 **Problem:** Training NNUE models involves multiple stages: data generation, filtering, training, validation, and comparison, which can easily become error-prone and slow when managed manually.
 
@@ -303,7 +223,7 @@ While the chess engine itself is performance-critical, its strength ultimately d
 
 The CLI acts as a single control plane for experimentation, ensuring that training runs are reproducible and comparable. By codifying the workflow, iteration speed increased while reducing human error and configuration drift.
 
-### 5.2 Distributed Testing & Regression Detection
+### 4.2 Distributed Testing & Regression Detection
 
 **Problem:** Small performance regressions in a chess engine are difficult to detect and often only appear under large-scale testing. Manual validation does not scale.
 
@@ -325,7 +245,7 @@ Validation is tightly integrated with the development workflow, allowing changes
 
 ---
 
-## 6 Design Trade-offs & Philosophy
+## 5 Design Trade-offs & Philosophy
 **TL;DR**
 * Balanced memory usage and performance by choosing a stateful Transposition Table
 * Language choices reflect subsystem-specific constraints
@@ -333,7 +253,7 @@ Validation is tightly integrated with the development workflow, allowing changes
 
 Minke’s architecture reflects a series of deliberate trade-offs evaluated under real performance constraints. Decisions were driven by empirical impact on throughput, memory locality, and search stability, in order to increase playing strength.
 
-### 6.1 State vs. Statelessness (Transposition Table)
+### 5.1 State vs. Statelessness (Transposition Table)
 
 **Problem:** A naive search recalculates positions repeatedly, wasting computation. The Transposition Table (TT) can store previously evaluated positions, but introduces complexity:
 
@@ -344,7 +264,7 @@ Minke’s architecture reflects a series of deliberate trade-offs evaluated unde
 
 **Trade-off**: While stateless designs simplify reasoning, they leave substantial performance on the table. The added complexity of a stateful TT was justified by measurable gains in node efficiency and move quality.
 
-### 6.2 Language Choice
+### 5.2 Language Choice
 
 **Problem:** Different parts of the system have different requirements:
 
@@ -358,7 +278,7 @@ Minke’s architecture reflects a series of deliberate trade-offs evaluated unde
 
 Rather than forcing a single-language solution, Minke treats language choice as an engineering parameter, selecting the best tool for each subsystem’s constraints.
 
-### 6.3 Search Depth vs. Evaluation Accuracy
+### 5.3 Search Depth vs. Evaluation Accuracy
 
 **Problem**: NNUE evaluation significantly increases per-node cost. Deeper search improves tactical resolution, while stronger evaluation reduces positional error at each node.
 
@@ -366,7 +286,7 @@ Rather than forcing a single-language solution, Minke treats language choice as 
 
 This approach treats evaluation speed as a first-class search parameter, allowing deeper exploration without regressing positional accuracy.
 
-### 6.4 Philosophy Summary
+### 5.4 Philosophy Summary
 
 Minke reflects a systems-oriented engineering mindset:
 
@@ -377,14 +297,14 @@ Minke reflects a systems-oriented engineering mindset:
 
 ---
 
-## 7 Reliability & Tooling
+## 6 Reliability & Tooling
 **TL;DR**
 * Validated engine correctness with deterministic benchmarks
 * Ensured performance stability via automated regression tests and CI pipelines
 
 This section focuses on engine correctness, determinism, and long-term stability, independent of playing strength improvements. While Section 5 addresses how changes are evaluated for strength, this section describes how Minke ensures that optimizations never compromise correctness and reproducibility.
 
-### 7.1 Deterministic Benchmarking & Correctness
+### 6.1 Deterministic Benchmarking & Correctness
 
 **Problem:** High-speed search engines are prone to subtle bugs in move generation, evaluation, or search logic. Traditional unit tests are not always meaningful because correctness depends on the full interaction of engine modules.
 
@@ -398,7 +318,7 @@ This section focuses on engine correctness, determinism, and long-term stability
 * Confidence that new optimizations preserve correct behavior
 * Avoids subtle errors that could appear only after thousands of games
 
-### 7.2 CI/CD & Regression Monitoring
+### 6.2 CI/CD & Regression Monitoring
 
 **Problem:** Frequent optimizations can inadvertently reduce playing strength or alter search behavior. Manual validation does not scale.
 
