@@ -1,13 +1,8 @@
-<div align="center">
-
 # Eduardo Marinho 
 [**GitHub**](https://github.com/enfmarinho) | [**LinkedIn**](https://linkedin.com/in/enfmarinho) | [**Email**](mailto:contact@eduardomarinho.dev)
 
 **Low-Level Systems & High-Performance Software Engineer**
-
-**BS in Computer Science @ Federal University of Rio Grande do Norte** (Expected July 2027)
-
-</div>
+*BS in Computer Science @ Federal University of Rio Grande do Norte (Expected July 2027)*
 
 ##### About
 Systems programmer focused on high-throughput, low-latency architectures in C++ and Rust. I build deterministic, memory-efficient systems optimized at the hardware level, validated through rigorous statistical testing and profiling.
