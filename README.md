@@ -2,6 +2,7 @@
 [**GitHub**](https://github.com/enfmarinho) | [**LinkedIn**](https://linkedin.com/in/enfmarinho) | [**Email**](mailto:contact@eduardomarinho.dev)
 
 **Low-Level Systems & High-Performance Software Engineer**
+
 *BS in Computer Science @ Federal University of Rio Grande do Norte (Expected July 2027)*
 
 ##### About
