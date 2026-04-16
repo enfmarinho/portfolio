@@ -153,7 +153,7 @@ inline int32_t vepi32_reduce_add(const vepi32 vec) {
 | None             | 1502485     | -            | 
 | AVX2             | 3082145     | ~105%        | 
 | BMI2             | 3119613     | ~107%        | 
-> Single-threaded search, fixed depth, identical position set. Tested on an intel i5-12400f.
+> Single-threaded search, fixed depth, identical position set. Tested on an intel i5-12400F.
 
 ### 3.2 Memory Locality & Bitboards
 
@@ -168,7 +168,7 @@ inline int32_t vepi32_reduce_add(const vepi32 vec) {
 
 > Visualizing the State: By treating a uint64_t as an 8×8 grid, we perform symmetric multiprocessing on a single register. For example, a single bitwise AND between a sliding piece bitboard and an occupancy bitboard calculates all possible blockages simultaneously, eliminating the need for expensive loops or nested arrays.
 * **Instruction-Level Optimization**: Leverages BMI2 instructions (e.g., PEXT) to implement Magic Bitboards. This transforms move generation from complex branching logic into a constant-time table lookup.
-* **Cache-Aligned Transposition Table**: Entries are strictly sized to 32 bytes. This ensures exactly two entries fit within a standard 64-byte CPU cache line, eliminating "split-line" fetches and significantly reducing L1/L2 cache pressure during heavy search workloads, reducing caches misses.
+* **Cache-Aligned Transposition Table**: Entries are strictly sized to 32 bytes. This ensures exactly two entries fit within a standard 64-byte CPU cache line, eliminating "split-line" fetches and significantly reducing L1/L2 cache pressure and minimizing expensive cache misses during heavy search workloads.
 
 **Result:** 
 * ~27% speedup in search throughput by minimizing memory stalls and branch mispredictions.
@@ -194,7 +194,7 @@ Each heuristic was introduced as a controlled experiment, evaluated **in isolati
 **Problem**: NNUE is the dominant per-node cost in Minke’s search pipeline. Unlike classical evaluators, its inference path introduces a non-trivial latency that is incurred millions of times during search, making evaluation throughput a primary performance concern.
 
 **Solution:**
-* **Incremental Accumulators**: Maintains per-side feature sums; only features affected by a move are updated. This approach drastically reduces redundant computation.
+* **Incremental Accumulators**: Maintains per-side feature sums; only features affected by a move are updated. This approach drastically reduces redundant computation and bounds worst-case evaluation latency.
 * **SIMD-Accelerated Kernels**: Evaluation kernels are implemented with AVX2/AVX512 (x86-64) and NEON (ARM) intrinsics, processing multiple weights simultaneously to maximize instruction-level parallelism.
 * **16-bit Quantization**: Network weights are quantized, trading minor precision loss for significant vectorization gains.
 * **Memory Layout Optimization**: Inputs and accumulators are stored in cache-aligned, contiguous arrays to minimize stalls and branch mispredictions.
